@@ -1,6 +1,6 @@
 # grunt-fontello
 
-> Download font library from fontello.com
+> donwload font icons from fontello.com
 
 ## Getting Started
 This plugin requires Grunt `~0.4.1`
@@ -25,65 +25,90 @@ In your project's Gruntfile, add a section named `fontello` to the data object p
 ```js
 grunt.initConfig({
   fontello: {
-    options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+    dist: {
+      options: {
+          config  : 'config.json',
+          fonts   : 'output/fonts',
+          styles  : 'output/css',
+          sass    : true,
+          force   : true
+      }
+    }
   },
 })
 ```
 
 ### Options
 
-#### options.separator
+#### options.config
 Type: `String`
-Default value: `',  '`
+Default value: `config.json`
 
-A string value that is used to do something with whatever.
+Path to your config.json file. Generate custom font icons [here](http://www.fontello.com);
 
-#### options.punctuation
+#### options.zip
 Type: `String`
-Default value: `'.'`
+Default value: `.`
 
-A string value that is used to do something else with whatever else.
+Folder to extract the full archive.
 
-### Usage Examples
+#### options.fonts
+Type: `String`
+Default value: `fonts`
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+Path to extract font files (*.eot, *.woff, *.svg, *.ttf)
 
-```js
-grunt.initConfig({
-  fontello: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-})
-```
+#### options.styles
+Type: `String`
+Default value: `css`
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+Path to extract css or sass files. See [options.sass](#options_sass)
 
+#### <a id="options_sass"></a>options.sass
+Type: `Boolean`
+Default value: `false`
+
+Setting this option to `true` will extract _.scss_ files instead of plain css.
+
+#### options.force
+Type: `Boolean`
+Default value: `false`
+
+By default, if the folder specified in _options.fonts_, _options.zip_ and _options.styles_ do not exist, the task will throw an error. Setting this option to `true` will create the directory structure specified.
+
+### Example
+
+#### Multiple Targets
 ```js
 grunt.initConfig({
   fontello: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
+      sass: true,
+      force: true
     },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
+    dist: {
+      options: {
+          fonts   : 'output/fonts',
+          styles  : 'output/css',
+      }
     },
+    dev: {
+      options: {
+          config  : 'test/config.json',
+          fonts   : 'test/output/fonts',
+          styles  : 'test/output/css',
+      }
+    }
   },
 })
-```
 
+grunt.loadNpmTasks('grunt-fontello');
+grunt.registerTask('default', ['fontello:dist']);
+```
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+_Shameless Confession:_ This is my very first [node](http://nodejs.org) and [grunt](http://gruntjs.com) project! contributing to this project contributes to my knowledge so please do! 
+
+- [jubal.mabaquiao@gmail.com](jubal.mabaquiao@gmail.com)
 
 ## Release History
 _(Nothing yet)_

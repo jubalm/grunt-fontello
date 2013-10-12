@@ -1,7 +1,7 @@
 {
   "name": "grunt-fontello",
   "description": "Download font library from fontello.com",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/jubal/grunt-fontello",
   "author": {
     "name": "Jubal Mabaquiao",
@@ -21,7 +21,6 @@
       "url": "https://github.com/jubal/grunt-fontello/blob/master/LICENSE-MIT"
     }
   ],
-  "main": "Gruntfile.js",
   "engines": {
     "node": ">= 0.8.0"
   },
@@ -36,13 +35,13 @@
   },
   "peerDependencies": {},
   "keywords": [
-    "gruntplugin"
+    "gruntplugin", "font-icon", "fontello", "icon", "font"
   ],
   "dependencies": {
     "async": "~0.2.9",
     "grunt": "~0.4.1",
     "mkdirp": "~0.3.5",
     "unzip": "~0.1.9",
-    "restler": "~2.0.1"
+    "needle": "~0.6.1"
   }
 }

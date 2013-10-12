@@ -8,6 +8,27 @@ var unzip   = require('unzip');
 var mkdirp  = require('mkdirp');
 var grunt   = require('grunt');
 
+/* Verify or build paths */
+var processPath = function(options, dir, callback){
+  fs.exists(dir, function(exists){
+    if(!exists) {
+      if(!options.force) {
+        callback(dir + ' missing! use `force:true` to create');
+      } else {
+        // Force create path
+        mkdirp(dir, function(err){
+          if (err) { callback(err); }
+          else {
+            callback(null, dir + ' created!');
+          }
+        });
+      }
+    } else {
+      callback(null, dir + ' verified!');
+    }
+  });
+};
+
 /*
 * Initial Checks
 * @callback: options
@@ -32,27 +53,6 @@ var init = function(options, callback){
     }
   });
 
-};
-
-/* Verify or build paths */
-var processPath = function(options, dir, callback){
-  fs.exists(dir, function(exists){
-    if(!exists) {
-      if(!options.force) {
-        callback(dir + ' missing! use `force:true` to create');
-      } else {
-        // Force create path
-        mkdirp(dir, function(err){
-          if (err) { callback(err); }
-          else {
-            callback(null, dir + ' created!');
-          }
-        });
-      }
-    } else {
-      callback(null, dir + ' verified!');
-    }
-  });
 };
 
 /*
@@ -117,9 +117,9 @@ var fetchStream = function(options, session, callback){
             // Extract CSS
             case '.css':
               // SCSS:
-              var cssPath = (options.scss)
-                  ? path.join(options.styles, path.basename(entry.path))
-                  : path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+              var cssPath = (options.scss) ? 
+                path.join(options.styles, path.basename(entry.path)) :
+                path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
               return entry.pipe(fs.createWriteStream(cssPath));
             // Extract Fonts
             case '.woff':case '.svg': case '.ttf': case '.eot':
