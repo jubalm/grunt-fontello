@@ -1,8 +1,8 @@
 {
   "name": "grunt-fontello",
   "description": "Download font library from fontello.com",
-  "version": "0.1.1",
-  "homepage": "https://github.com/jubal/grunt-fontello",
+  "version": "0.1.2",
+  "homepage": "https://github.com/jubalm/grunt-fontello",
   "author": {
     "name": "Jubal Mabaquiao",
     "email": "jubal.mabaquiao@gmail.com",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/jubal/grunt-fontello.git"
+    "url": "git://github.com/jubalm/grunt-fontello.git"
   },
   "bugs": {
-    "url": "https://github.com/jubal/grunt-fontello/issues"
+    "url": "https://github.com/jubalm/grunt-fontello/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/jubal/grunt-fontello/blob/master/LICENSE-MIT"
+      "url": "https://github.com/jubalm/grunt-fontello/blob/master/LICENSE-MIT"
     }
   ],
   "engines": {
