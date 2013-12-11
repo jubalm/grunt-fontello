@@ -30,15 +30,13 @@ module.exports = function(grunt) {
 
     // Configuration to be run (and then tested).
     fontello: {
-      options: {
-        sass: true
-      },
       test: {
         options: {
           config: 'test/config.json',
           fonts: 'test/output/fonts',
           styles: 'test/output/css',
-//          zip: 'test/output',
+          // scss: true
+          // zip: 'test/output',
           force: true
         }
       }

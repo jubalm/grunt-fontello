@@ -117,7 +117,7 @@ var fetchStream = function(options, session, callback){
             // Extract CSS
             case '.css':
               // SCSS:
-              var cssPath = (options.scss) ? 
+              var cssPath = (!options.scss) ? 
                 path.join(options.styles, path.basename(entry.path)) :
                 path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
               return entry.pipe(fs.createWriteStream(cssPath));
