@@ -64,7 +64,7 @@ Default value: `css`
 
 Path to extract css or sass files. See [options.sass](#options_sass)
 
-#### <a id="options_sass"></a>options.sass
+#### <a id="options_scss"></a>options.scss
 Type: `Boolean`
 Default value: `false`
 
