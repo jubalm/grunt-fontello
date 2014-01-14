@@ -30,7 +30,7 @@ grunt.initConfig({
           config  : 'config.json',
           fonts   : 'output/fonts',
           styles  : 'output/css',
-          sass    : true,
+          scss    : true,
           force   : true
       }
     }
