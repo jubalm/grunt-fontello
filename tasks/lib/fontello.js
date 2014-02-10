@@ -36,11 +36,12 @@ var processPath = function(options, dir, callback){
 var init = function(options, callback){
 
   grunt.log.write('Verify paths...');
-  async.parallel([
+  var tests = [
     processPath.bind(null, options, options.fonts),
     processPath.bind(null, options, options.styles)
-  ], function(err, results){
-    if(err) { 
+  ];
+  async.parallel(options.styles ? tests : [tests[0]], function(err, results){
+    if(err) {
       grunt.log.error(err);
       callback(err);
     }
@@ -114,19 +115,22 @@ var fetchStream = function(options, session, callback){
 
         if(entry.type === 'File'){
           switch(ext){
-            // Extract CSS
-            case '.css':
-              // SCSS:
-              var cssPath = (!options.scss) ? 
-                path.join(options.styles, path.basename(entry.path)) :
-                path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-              return entry.pipe(fs.createWriteStream(cssPath));
             // Extract Fonts
             case '.woff':case '.svg': case '.ttf': case '.eot':
               var fontPath = path.join(options.fonts, path.basename(entry.path));
               return entry.pipe(fs.createWriteStream(fontPath));
+            // Extract CSS
+            case '.css':
+              // SCSS:
+              if (options.styles) {
+                  var cssPath = (!options.scss) ?
+                    path.join(options.styles, path.basename(entry.path)) :
+                    path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                  return entry.pipe(fs.createWriteStream(cssPath));
+              }
             // Drain everything else
             default:
+              grunt.verbose.writeln('Ignored ', entry.path);
               entry.autodrain();
           }
         }
