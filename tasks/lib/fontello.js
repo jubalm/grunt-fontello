@@ -118,6 +118,11 @@ var createSession = function(options, callback){
 **/
 var fetchStream = function(options, session, callback){
 
+  // The Fontello api outputs an error message instead of a session id if the
+  // config file contains unexpected data. Pass that error on.
+  if (/Invalid/.test(session))
+    throw new Error(session);
+
   var tempConfig = process.cwd() + '/config-tmp.json';
   var tempZip = process.cwd() + '/fontello-tmp.zip';
   setSession(options, session);
