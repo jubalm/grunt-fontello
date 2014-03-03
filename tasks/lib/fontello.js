@@ -145,48 +145,48 @@ var fetchStream = function(options, session, callback){
       return readStream.pipe(unzip.Parse())
         // TODO: fix inconsistent return point
         .on('entry', function(entry){
-        var ext = path.extname(entry.path);
-
-        if(entry.type === 'File') {
-          switch(ext){
-          // Extract Fonts
-          case '.woff':case '.svg': case '.ttf': case '.eot':
-            var fontPath = path.join(options.fonts, path.basename(entry.path));
-            return entry.pipe(fs.createWriteStream(fontPath));
-          // Extract CSS
-          case '.css':
-            // SCSS:
-            if (options.styles) {
-              var cssPath = (!options.scss) ?
-              path.join(options.styles, path.basename(entry.path)) :
-              path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-              return entry.pipe(fs.createWriteStream(cssPath));
+          var ext = path.extname(entry.path);
+  
+          if(entry.type === 'File') {
+            switch(ext){
+            // Extract Fonts
+            case '.woff':case '.svg': case '.ttf': case '.eot':
+              var fontPath = path.join(options.fonts, path.basename(entry.path));
+              return entry.pipe(fs.createWriteStream(fontPath));
+            // Extract CSS
+            case '.css':
+              // SCSS:
+              if (options.styles) {
+                var cssPath = (!options.scss) ?
+                path.join(options.styles, path.basename(entry.path)) :
+                path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                return entry.pipe(fs.createWriteStream(cssPath));
+              }
+            case '.json':
+              if (options.updateConfig) {
+                var r = entry.pipe(fs.createWriteStream(tempConfig));
+                r.on('finish', function() {
+                  var config = require(tempConfig);
+                  setSession(options, session, config);
+                  fs.unlinkSync(tempConfig);
+                });
+             }
+            // Drain everything else
+            default:
+              grunt.verbose.writeln('Ignored ', entry.path);
+              entry.autodrain();
             }
-          case '.json':
-            if (options.updateConfig) {
-              var r = entry.pipe(fs.createWriteStream(tempConfig));
-              r.on('finish', function() {
-                var config = require(tempConfig);
-                setSession(options, session, config);
-                fs.unlinkSync(tempConfig);
-              });
-           }
-          // Drain everything else
-          default:
-            grunt.verbose.writeln('Ignored ', entry.path);
-            entry.autodrain();
           }
-        }
         })
         .on('close', function(){
-          fs.unlinkSync(tempZip);
-          grunt.log.ok();
-          callback(null, 'extract complete');
-       });
-       }
-       /* Extract full archive */
-       return readStream.pipe(unzip.Extract({ path: options.zip }))
-         .on('close', function(){
+           fs.unlinkSync(tempZip);
+           grunt.log.ok();
+           callback(null, 'extract complete');
+        });
+      }
+      /* Extract full archive */
+      return readStream.pipe(unzip.Extract({ path: options.zip }))
+        .on('close', function(){
           grunt.log.ok();
           fs.unlinkSync(tempZip);
           callback(null, 'Fontello extracted to '+options.zip);
