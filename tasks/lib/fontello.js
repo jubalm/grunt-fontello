@@ -178,7 +178,7 @@ var fetchStream = function(options, session, callback){
           }
         }
         })
-        .on('finish', function(){
+        .on('close', function(){
           fs.unlinkSync(tempZip);
           grunt.log.ok();
           callback(null, 'extract complete');
@@ -186,7 +186,7 @@ var fetchStream = function(options, session, callback){
        }
        /* Extract full archive */
        return readStream.pipe(unzip.Extract({ path: options.zip }))
-         .on('finish', function(){
+         .on('close', function(){
           grunt.log.ok();
           fs.unlinkSync(tempZip);
           callback(null, 'Fontello extracted to '+options.zip);
