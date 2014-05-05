@@ -135,7 +135,7 @@ var fetchStream = function(options, session, callback){
           }
         }
       })
-      .on('finish', function(){
+      .on('close', function(){
         grunt.log.ok();
         callback(null, 'extract complete');
       });
