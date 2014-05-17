@@ -18,13 +18,14 @@ module.exports = function(grunt) {
     var
       done    = this.async(),
       options = this.options({
-        host    : 'http://fontello.com',
-        config  : 'config.json',
-        fonts   : 'fonts',
-        styles  : 'css',
-        zip     : false,
-        scss    : false,
-        force   : true
+        host           : 'http://fontello.com',
+        config         : 'config.json',
+        fonts          : 'fonts',
+        styles         : 'css',
+        zip            : false,
+        scss           : false,
+        force          : true,
+        updateConfig   : false
       });
 
     var recipe = [ 

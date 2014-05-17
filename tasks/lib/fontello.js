@@ -29,6 +29,18 @@ var processPath = function(options, dir, callback){
   });
 };
 
+var setSession = function(options, session, config){
+  var dest = process.cwd() + '/' + options.config;
+
+  if (undefined == config)
+    config = require(dest);
+
+  // Write session to config file. Save session in name field since the
+  // Fontello api dislikes custom members.
+  config.name = session;
+  fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
+}
+
 /*
 * Initial Checks
 * @callback: options
@@ -73,19 +85,28 @@ var createSession = function(options, callback){
     }
   };
 
-  grunt.log.write('Creating session...');
-  needle.post( options.host, data, { multipart: true }, function(err, res, body){
-       if (err) {
-         grunt.log.error();
-         callback(err);
+  var session = null;
+  var config = require(process.cwd() + '/' + options.config);
+
+  if (config.name) {
+    session = config.name
+    callback(null, options, session);
+  }
+  else {
+    grunt.log.write('Creating session...');
+    needle.post( options.host, data, { multipart: true }, function(err, res, body){
+         if (err) {
+           grunt.log.error();
+           callback(err);
+         }
+         else {
+           grunt.log.ok();
+           grunt.log.debug('sid: ' + body);
+           callback(null, options, body);
+         }
        }
-       else {
-         grunt.log.ok();
-         grunt.log.debug('sid: ' + body);
-         callback(null, options, body);
-       }
-     }
-  );
+    );
+  }
 
 };
 
@@ -97,24 +118,37 @@ var createSession = function(options, callback){
 **/
 var fetchStream = function(options, session, callback){
 
+  // The Fontello api outputs an error message instead of a session id if the
+  // config file contains unexpected data. Pass that error on.
+  if (/Invalid/.test(session))
+    throw new Error(session);
+
+  var tempConfig = process.cwd() + '/config-tmp.json';
+  var tempZip = process.cwd() + '/fontello-tmp.zip';
+  setSession(options, session);
+
   grunt.log.write('Fetching archive...');
-  var request = needle.get(options.host + '/' + session + '/get', function(err){
-    if(err){
-      grunt.log.err();
-      callback(err);
+  needle.get(options.host + '/' + session + '/get', function(err, response, body){
+
+    if(response.statusCode == 404)
+    {
+      setSession(options, '');
+	  createSession(options, fetchStream);
     }
-  });
+    else
+    {
+      fs.writeFileSync(tempZip, body);
+      var readStream = fs.createReadStream(tempZip);
 
-  /* Extract Files */
-  if(options.fonts || options.styles) {
-    return request.pipe(unzip.Parse())
-      // TODO: fix inconsistent return point
-      .on('entry', function(entry){
-
-        var ext = path.extname(entry.path);
-
-        if(entry.type === 'File'){
-          switch(ext){
+      /* Extract Files */
+      if(options.fonts || options.styles) {
+      return readStream.pipe(unzip.Parse())
+        // TODO: fix inconsistent return point
+        .on('entry', function(entry){
+          var ext = path.extname(entry.path);
+  
+          if(entry.type === 'File') {
+            switch(ext){
             // Extract Fonts
             case '.woff':case '.svg': case '.ttf': case '.eot':
               var fontPath = path.join(options.fonts, path.basename(entry.path));
@@ -123,30 +157,47 @@ var fetchStream = function(options, session, callback){
             case '.css':
               // SCSS:
               if (options.styles) {
-                  var cssPath = (!options.scss) ?
-                    path.join(options.styles, path.basename(entry.path)) :
-                    path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                  return entry.pipe(fs.createWriteStream(cssPath));
+                var cssPath = (!options.scss) ?
+                path.join(options.styles, path.basename(entry.path)) :
+                path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                return entry.pipe(fs.createWriteStream(cssPath));
               }
+            case '.json':
+              if (options.updateConfig) {
+                var r = entry.pipe(fs.createWriteStream(tempConfig));
+                r.on('finish', function() {
+                  var config = require(tempConfig);
+                  setSession(options, session, config);
+                  fs.unlinkSync(tempConfig);
+                });
+             }
             // Drain everything else
             default:
               grunt.verbose.writeln('Ignored ', entry.path);
               entry.autodrain();
+            }
           }
-        }
-      })
-      .on('finish', function(){
-        grunt.log.ok();
-        callback(null, 'extract complete');
+        })
+        .on('close', function(){
+           fs.unlinkSync(tempZip);
+           grunt.log.ok();
+           callback(null, 'extract complete');
+        });
+      }
+      /* Extract full archive */
+      return readStream.pipe(unzip.Extract({ path: options.zip }))
+        .on('close', function(){
+          grunt.log.ok();
+          fs.unlinkSync(tempZip);
+          callback(null, 'Fontello extracted to '+options.zip);
       });
-  }
+    }
+    if(err){
+      grunt.log.err();
+      callback(err);
+    }
+  });
 
-  /* Extract full archive */
-  return request.pipe(unzip.Extract({ path: options.zip }))
-    .on('finish', function(){
-      grunt.log.ok();
-      callback(null, 'Fontello extracted to '+options.zip);
-    });
 
 };
 
