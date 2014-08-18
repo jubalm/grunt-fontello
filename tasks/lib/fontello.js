@@ -29,6 +29,35 @@ var processPath = function(options, dir, callback){
   });
 };
 
+var setFontPath = function (options) {
+  var css2FontPath = path.relative(options.styles, options.fonts);
+
+  grunt.log.write('Processing font path...');
+
+  try {
+    fs.readdir(options.styles, function (err, files) {
+      for (i in files) {
+        if (!files.hasOwnProperty(i))
+          continue;
+
+        var filePath = path.join(options.styles, files[i]);
+
+        if (fs.statSync(filePath).isDirectory())
+          continue;
+
+        var content = fs.readFileSync(filePath);
+        fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath))
+      }
+    });
+
+    grunt.log.debug('Font path is ' + css2FontPath);
+    grunt.log.ok();
+  } catch (err) {
+    grunt.log.error(err);
+    grunt.log.fail();
+  }
+};
+
 var setSession = function(options, session, config){
   var dest = process.cwd() + '/' + options.config;
 
@@ -39,7 +68,7 @@ var setSession = function(options, session, config){
   // Fontello api dislikes custom members.
   config.name = session;
   fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
-}
+};
 
 /*
 * Initial Checks
@@ -146,7 +175,7 @@ var fetchStream = function(options, session, callback){
         // TODO: fix inconsistent return point
         .on('entry', function(entry){
           var ext = path.extname(entry.path);
-  
+
           if(entry.type === 'File') {
             switch(ext){
             // Extract Fonts
@@ -160,7 +189,8 @@ var fetchStream = function(options, session, callback){
                 var cssPath = (!options.scss) ?
                 path.join(options.styles, path.basename(entry.path)) :
                 path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                return entry.pipe(fs.createWriteStream(cssPath));
+
+				return entry.pipe(fs.createWriteStream(cssPath));
               }
             case '.json':
               if (options.updateConfig) {
@@ -204,5 +234,6 @@ var fetchStream = function(options, session, callback){
 module.exports = {
   init    : init,
   post    : createSession,
-  fetch   : fetchStream
+  fetch   : fetchStream,
+  fontPath: setFontPath
  };
