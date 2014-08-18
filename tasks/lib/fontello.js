@@ -68,7 +68,7 @@ var setSession = function(options, session, config){
   // Fontello api dislikes custom members.
   config.name = session;
   fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
-};
+}
 
 /*
 * Initial Checks
@@ -189,8 +189,7 @@ var fetchStream = function(options, session, callback){
                 var cssPath = (!options.scss) ?
                 path.join(options.styles, path.basename(entry.path)) :
                 path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-
-				return entry.pipe(fs.createWriteStream(cssPath));
+                return entry.pipe(fs.createWriteStream(cssPath));
               }
             case '.json':
               if (options.updateConfig) {

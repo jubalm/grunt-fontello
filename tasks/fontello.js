@@ -32,7 +32,7 @@ module.exports = function(grunt) {
       fontello.init.bind(null, options),
       fontello.post,
       fontello.fetch,
-	  fontello.fontPath.bind(null, options)
+      fontello.fontPath.bind(null, options)
     ];
 
     async.waterfall(recipe, function(err, results){
