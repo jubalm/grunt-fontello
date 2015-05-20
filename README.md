@@ -62,7 +62,7 @@ Path to extract font files (*.eot, *.woff, *.svg, *.ttf)
 Type: `String`
 Default value: `css`
 
-Path to extract css or sass files. See [options.sass](#options_sass)
+Path to extract css or scss files. See [options.scss](#options_scss)
 
 #### <a id="options_scss"></a>options.scss
 Type: `Boolean`
@@ -83,7 +83,7 @@ By default, if the folder specified in _options.fonts_, _options.zip_ and _optio
 grunt.initConfig({
   fontello: {
     options: {
-      sass: true,
+      scss: true,
       force: true
     },
     dist: {
