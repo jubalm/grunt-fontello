@@ -7,6 +7,7 @@ var needle  = require('needle');
 var unzip   = require('unzip');
 var mkdirp  = require('mkdirp');
 var grunt   = require('grunt');
+var replaceStream = require('replacestream');
 
 /* Verify or build paths */
 var processPath = function(options, dir, callback){
@@ -174,7 +175,12 @@ var fetchStream = function(options, session, callback){
                 var cssPath = (!options.scss) ?
                 path.join(options.styles, path.basename(entry.path)) :
                 path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                return entry.pipe(fs.createWriteStream(cssPath));
+
+                if (options.cssFontPath && options.cssFontPath.trim()) {
+                    return entry.pipe(replaceStream('../font', options.cssFontPath)).pipe(fs.createWriteStream(cssPath));
+                } else {
+                    return entry.pipe(fs.createWriteStream(cssPath));
+                }
               }
             case '.json':
               if (options.updateConfig) {
