@@ -94,7 +94,14 @@ var createSession = function(options, callback){
   }
   else {
     grunt.log.write('Creating session...');
-    needle.post( options.host, data, { multipart: true }, function(err, res, body){
+
+    var requestOptions = { multipart: true };
+
+    if (options.proxy) {
+        requestOptions.proxy = options.proxy;
+    }
+
+    needle.post( options.host, data, requestOptions, function(err, res, body){
          if (err) {
            grunt.log.error();
            callback(err);
@@ -128,7 +135,14 @@ var fetchStream = function(options, session, callback){
   setSession(options, session);
 
   grunt.log.write('Fetching archive...');
-  needle.get(options.host + '/' + session + '/get', function(err, response, body){
+
+  var requestOptions = {};
+
+  if (options.proxy) {
+    requestOptions.proxy = options.proxy;
+  }
+
+  needle.get(options.host + '/' + session + '/get', requestOptions, function(err, response, body){
 
     if(response.statusCode == 404)
     {
