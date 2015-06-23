@@ -7,6 +7,7 @@ var needle  = require('needle');
 var unzip   = require('unzip');
 var mkdirp  = require('mkdirp');
 var grunt   = require('grunt');
+var replaceStream = require('replacestream');
 
 /* Verify or build paths */
 var processPath = function(options, dir, callback){
@@ -94,7 +95,14 @@ var createSession = function(options, callback){
   }
   else {
     grunt.log.write('Creating session...');
-    needle.post( options.host, data, { multipart: true }, function(err, res, body){
+
+    var requestOptions = { multipart: true };
+
+    if (options.proxy) {
+        requestOptions.proxy = options.proxy;
+    }
+
+    needle.post( options.host, data, requestOptions, function(err, res, body){
          if (err) {
            grunt.log.error();
            callback(err);
@@ -128,7 +136,14 @@ var fetchStream = function(options, session, callback){
   setSession(options, session);
 
   grunt.log.write('Fetching archive...');
-  needle.get(options.host + '/' + session + '/get', function(err, response, body){
+
+  var requestOptions = {};
+
+  if (options.proxy) {
+    requestOptions.proxy = options.proxy;
+  }
+
+  needle.get(options.host + '/' + session + '/get', requestOptions, function(err, response, body){
 
     if(response.statusCode == 404)
     {
@@ -160,7 +175,12 @@ var fetchStream = function(options, session, callback){
                 var cssPath = (!options.scss) ?
                 path.join(options.styles, path.basename(entry.path)) :
                 path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                return entry.pipe(fs.createWriteStream(cssPath));
+
+                if (options.cssFontPath && options.cssFontPath.trim()) {
+                    return entry.pipe(replaceStream('../font', options.cssFontPath)).pipe(fs.createWriteStream(cssPath));
+                } else {
+                    return entry.pipe(fs.createWriteStream(cssPath));
+                }
               }
             case '.json':
               if (options.updateConfig) {

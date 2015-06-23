@@ -27,11 +27,13 @@ grunt.initConfig({
   fontello: {
     dist: {
       options: {
-          config  : 'config.json',
-          fonts   : 'output/fonts',
-          styles  : 'output/css',
-          scss    : true,
-          force   : true
+          proxy         : 'http://myproxy.com',
+          cssFontPath   : './newpath/to/my/css',
+          config        : 'config.json',
+          fonts         : 'output/fonts',
+          styles        : 'output/css',
+          scss          : true,
+          force         : true
       }
     }
   },
@@ -75,6 +77,18 @@ Type: `Boolean`
 Default value: `false`
 
 By default, if the folder specified in _options.fonts_, _options.zip_ and _options.styles_ do not exist, the task will throw an error. Setting this option to `true` will create the directory structure specified.
+
+#### options.proxy
+Type: `String`
+Default value: none
+
+Set the proxy to download the files
+
+#### options.cssFontPath
+Type: `String`
+Default value: '../fonts'
+
+Path to the fonts files relative to the css files
 
 ### Example
 
