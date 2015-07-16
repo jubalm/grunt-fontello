@@ -76,6 +76,12 @@ Default value: `false`
 
 By default, if the folder specified in _options.fonts_, _options.zip_ and _options.styles_ do not exist, the task will throw an error. Setting this option to `true` will create the directory structure specified.
 
+#### options.exclude
+Type: `Array`
+Default value: `[]`
+
+An array of names of files which are excluded
+
 ### Example
 
 #### Multiple Targets
@@ -105,6 +111,22 @@ grunt.initConfig({
 grunt.loadNpmTasks('grunt-fontello');
 grunt.registerTask('default', ['fontello:dist']);
 ```
+
+#### Exclude files
+```js
+grunt.initConfig({
+  fontello: {
+    dist: {
+      options: {
+          fonts   : 'output/fonts',
+          styles  : 'output/css',
+          exclude: ['animation.css', 'fontello-ie7-codes.css', 'fontello.eot'],
+      }
+    },
+  },
+})
+```
+
 ## Contributing
 _Shameless Confession:_ This is my very first [node](http://nodejs.org) and [grunt](http://gruntjs.com) project! contributing to this project contributes to my knowledge so please do! 
 

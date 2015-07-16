@@ -22,6 +22,7 @@ module.exports = function(grunt) {
         config         : 'config.json',
         fonts          : 'fonts',
         styles         : 'css',
+        exclude        : [],
         zip            : false,
         scss           : false,
         force          : true,

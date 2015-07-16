@@ -146,35 +146,41 @@ var fetchStream = function(options, session, callback){
         // TODO: fix inconsistent return point
         .on('entry', function(entry){
           var ext = path.extname(entry.path);
-  
+          var name = path.basename(entry.path);
+          
           if(entry.type === 'File') {
-            switch(ext){
-            // Extract Fonts
-            case '.woff':case '.svg': case '.ttf': case '.eot':
-              var fontPath = path.join(options.fonts, path.basename(entry.path));
-              return entry.pipe(fs.createWriteStream(fontPath));
-            // Extract CSS
-            case '.css':
-              // SCSS:
-              if (options.styles) {
-                var cssPath = (!options.scss) ?
-                path.join(options.styles, path.basename(entry.path)) :
-                path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                return entry.pipe(fs.createWriteStream(cssPath));
+            if(options.exclude.indexOf(name) !== -1) {
+                grunt.verbose.writeln('Ignored ', entry.path);
+                entry.autodrain();
+            } else {
+              switch(ext){
+              // Extract Fonts
+              case '.woff':case '.svg': case '.ttf': case '.eot':
+                var fontPath = path.join(options.fonts, path.basename(entry.path));
+                return entry.pipe(fs.createWriteStream(fontPath));
+              // Extract CSS
+              case '.css':
+                // SCSS:
+                if (options.styles) {
+                  var cssPath = (!options.scss) ?
+                  path.join(options.styles, path.basename(entry.path)) :
+                  path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                  return entry.pipe(fs.createWriteStream(cssPath));
+                }
+              case '.json':
+                if (options.updateConfig) {
+                  var r = entry.pipe(fs.createWriteStream(tempConfig));
+                  r.on('finish', function() {
+                    var config = require(tempConfig);
+                    setSession(options, session, config);
+                    fs.unlinkSync(tempConfig);
+                  });
+               }
+              // Drain everything else
+              default:
+                grunt.verbose.writeln('Ignored ', entry.path);
+                entry.autodrain();
               }
-            case '.json':
-              if (options.updateConfig) {
-                var r = entry.pipe(fs.createWriteStream(tempConfig));
-                r.on('finish', function() {
-                  var config = require(tempConfig);
-                  setSession(options, session, config);
-                  fs.unlinkSync(tempConfig);
-                });
-             }
-            // Drain everything else
-            default:
-              grunt.verbose.writeln('Ignored ', entry.path);
-              entry.autodrain();
             }
           }
         })
