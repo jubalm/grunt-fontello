@@ -142,7 +142,7 @@ var fetchStream = function(options, session, callback){
 
       /* Extract Files */
       if(options.fonts || options.styles) {
-      return readStream.pipe(unzip.Parse())
+      readStream.pipe(unzip.Parse())
         // TODO: fix inconsistent return point
         .on('entry', function(entry){
           var ext = path.extname(entry.path);
@@ -185,6 +185,7 @@ var fetchStream = function(options, session, callback){
         });
       }
       /* Extract full archive */
+      if(!options.zip){return}
       return readStream.pipe(unzip.Extract({ path: options.zip }))
         .on('close', function(){
           grunt.log.ok();
