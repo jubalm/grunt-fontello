@@ -1,7 +1,7 @@
 {
   "name": "grunt-fontello",
   "description": "Download font library from fontello.com",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "homepage": "https://github.com/jubalm/grunt-fontello",
   "author": {
     "name": "Jubal Mabaquiao",
@@ -35,7 +35,11 @@
   },
   "peerDependencies": {},
   "keywords": [
-    "gruntplugin", "font-icon", "fontello", "icon", "font"
+    "gruntplugin",
+    "font-icon",
+    "fontello",
+    "icon",
+    "font"
   ],
   "dependencies": {
     "async": "~0.2.9",
