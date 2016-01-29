@@ -106,9 +106,12 @@ grunt.loadNpmTasks('grunt-fontello');
 grunt.registerTask('default', ['fontello:dist']);
 ```
 ## Contributing
-_Shameless Confession:_ This is my very first [node](http://nodejs.org) and [grunt](http://gruntjs.com) project! contributing to this project contributes to my knowledge so please do! 
+_Shameless Confession:_ This is my very first [node](http://nodejs.org) and [grunt](http://gruntjs.com) project! contributing to this project contributes to my knowledge so please do!
 
 - [jubal.mabaquiao@gmail.com](jubal.mabaquiao@gmail.com)
 
 ## Release History
-_(Nothing yet)_
+
+#### Update 2016/01/29
+- fixed outdated needle dependency
+- bumped npm version to 0.1.4
