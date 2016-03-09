@@ -155,7 +155,7 @@ var fetchStream = function(options, session, callback){
             } else {
               switch(ext){
               // Extract Fonts
-              case '.woff':case '.svg': case '.ttf': case '.eot':
+              case '.woff':case '.svg': case '.ttf': case '.eot': case '.woff2':
                 var fontPath = path.join(options.fonts, path.basename(entry.path));
                 return entry.pipe(fs.createWriteStream(fontPath));
               // Extract CSS
