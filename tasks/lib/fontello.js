@@ -38,7 +38,7 @@ var setSession = function(options, session, config){
   // Write session to config file. Save session in name field since the
   // Fontello api dislikes custom members.
   config.name = session;
-  fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
+  fs.writeFileSync(dest, JSON.stringify(config, null, '  '));
 }
 
 /*
