@@ -1,3 +1,5 @@
+.修复传递zip参数无效的问题
+
 # grunt-fontello
 
 > donwload font icons from fontello.com
