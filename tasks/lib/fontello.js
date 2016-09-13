@@ -123,12 +123,19 @@ var fetchStream = function(options, session, callback){
   if (/Invalid/.test(session))
     throw new Error(session);
 
+  var getOptions = {
+    follow: 10
+  };
   var tempConfig = process.cwd() + '/config-tmp.json';
   var tempZip = process.cwd() + '/fontello-tmp.zip';
   setSession(options, session);
 
   grunt.log.write('Fetching archive...');
-  needle.get(options.host + '/' + session + '/get', function(err, response, body){
+  needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
+
+    if (err) {
+      throw err;
+    }
 
     if(response.statusCode == 404)
     {
