@@ -30,15 +30,11 @@ var processPath = function(options, dir, callback){
 };
 
 var setSession = function(options, session, config){
-  var dest = process.cwd() + '/' + options.config;
-
-  if (undefined == config)
-    config = require(dest);
+  var dest = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
 
   // Write session to config file. Save session in name field since the
   // Fontello api dislikes custom members.
-  config.name = session;
-  fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
+  fs.writeFileSync(dest, session);
 }
 
 /*
@@ -75,8 +71,6 @@ var init = function(options, callback){
 * @callback: session id
 * */
 var createSession = function(options, callback){
-
-  // TODO: save session somewhere else?
 
   var data = {
     config: {
@@ -154,7 +148,7 @@ var fetchStream = function(options, session, callback){
         .on('entry', function(entry){
           var ext = path.extname(entry.path);
           var name = path.basename(entry.path);
-          
+
           if(entry.type === 'File') {
             if(options.exclude.indexOf(name) !== -1) {
                 grunt.verbose.writeln('Ignored ', entry.path);
