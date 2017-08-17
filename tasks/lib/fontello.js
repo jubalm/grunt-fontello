@@ -134,7 +134,6 @@ var fetchStream = function(options, session, callback){
   var getOptions = {
     follow: 10
   };
-  var tempConfig = process.cwd() + '/config-tmp.json';
   var tempZip = process.cwd() + '/fontello-tmp.zip';
 
   grunt.log.write('Fetching archive...');
@@ -181,15 +180,6 @@ var fetchStream = function(options, session, callback){
                   path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
                   return entry.pipe(fs.createWriteStream(cssPath));
                 }
-              case '.json':
-                if (options.updateConfig) {
-                  var r = entry.pipe(fs.createWriteStream(tempConfig));
-                  r.on('finish', function() {
-                    var config = require(tempConfig);
-                    setSession(options, session, config);
-                    fs.unlinkSync(tempConfig);
-                  });
-               }
               // Drain everything else
               default:
                 grunt.verbose.writeln('Ignored ', entry.path);

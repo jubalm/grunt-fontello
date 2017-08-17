@@ -25,11 +25,10 @@ module.exports = function(grunt) {
         exclude        : [],
         zip            : false,
         scss           : false,
-        force          : true,
-        updateConfig   : false
+        force          : true
       });
 
-    var recipe = [ 
+    var recipe = [
       fontello.init.bind(null, options),
       fontello.post,
       fontello.fetch
