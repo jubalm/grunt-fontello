@@ -32,8 +32,7 @@ var processPath = function(options, dir, callback){
 var getSession = function(){
   var src = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
 
-  // Make sure the session file exists, return `null`
-  // if it doesn't
+  // Make sure the session file exists, return `null` otherwise.
   if (!fs.existsSync(src)) {
     return null;
   }
@@ -43,7 +42,14 @@ var getSession = function(){
 }
 
 var setSession = function(session){
-  var dest = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
+  var dir = path.resolve(process.cwd(), 'node_modules/grunt-fontello');
+  var dest = path.resolve(dir, 'session');
+
+  // Make sure the grunt-fontello directory exists, otherwise
+  // just don't safe the session.
+  if (!fs.existsSync(dir)) {
+    return null;
+  }
 
   // Write session to the session file since the Fontello
   // api dislikes custom members.
