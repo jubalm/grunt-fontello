@@ -29,11 +29,24 @@ var processPath = function(options, dir, callback){
   });
 };
 
-var setSession = function(options, session, config){
+var getSession = function(){
+  var src = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
+
+  // Make sure the session file exists, return `null`
+  // if it doesn't
+  if (!fs.existsSync(src)) {
+    return null;
+  }
+
+  // Read session from the session file.
+  return fs.readFileSync(src, { encoding: 'utf-8'});
+}
+
+var setSession = function(session){
   var dest = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
 
-  // Write session to config file. Save session in name field since the
-  // Fontello api dislikes custom members.
+  // Write session to the session file since the Fontello
+  // api dislikes custom members.
   fs.writeFileSync(dest, session);
 }
 
@@ -79,11 +92,9 @@ var createSession = function(options, callback){
     }
   };
 
-  var session = null;
-  var config = require(process.cwd() + '/' + options.config);
+  var session = getSession();
 
-  if (config.name) {
-    session = config.name
+  if (session !== null) {
     callback(null, options, session);
   }
   else {
@@ -96,6 +107,9 @@ var createSession = function(options, callback){
          else {
            grunt.log.ok();
            grunt.log.debug('sid: ' + body);
+
+           // Store the new sid and continue
+           setSession(body);
            callback(null, options, body);
          }
        }
@@ -122,7 +136,6 @@ var fetchStream = function(options, session, callback){
   };
   var tempConfig = process.cwd() + '/config-tmp.json';
   var tempZip = process.cwd() + '/fontello-tmp.zip';
-  setSession(options, session);
 
   grunt.log.write('Fetching archive...');
   needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
