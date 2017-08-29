@@ -8,6 +8,10 @@ var unzip   = require('unzip');
 var mkdirp  = require('mkdirp');
 var grunt   = require('grunt');
 
+var getOptions = {
+  follow: 10
+};
+
 /* Verify or build paths */
 var processPath = function(options, dir, callback){
   fs.exists(dir, function(exists){
@@ -69,12 +73,32 @@ var init = function(options, callback){
 };
 
 /*
+* Check Session
+* URL: http://fontello.com
+* GET: http://fontello.com/SESSIONID/get
+* @callback: bool representing expiration of session
+* */
+var checkSession = function(options, callback){
+  var expired = false;
+  var config = require(process.cwd() + '/' + options.config);
+
+  grunt.log.write('Checking session...');
+  needle.get(options.host + '/' + config.name + '/get', getOptions, function(err, response, body){
+    if(response.statusCode == 500)
+      expired = true;
+
+    grunt.log.ok();
+    callback(null, options, expired);
+  });
+};
+
+/*
 * Create Session
 * URL: http://fontello.com
 * POST: config.json
 * @callback: session id
 * */
-var createSession = function(options, callback){
+var createSession = function(options, expired, callback){
 
   // TODO: save session somewhere else?
 
@@ -88,7 +112,7 @@ var createSession = function(options, callback){
   var session = null;
   var config = require(process.cwd() + '/' + options.config);
 
-  if (config.name) {
+  if (config.name && !expired) {
     session = config.name
     callback(null, options, session);
   }
@@ -123,9 +147,6 @@ var fetchStream = function(options, session, callback){
   if (/Invalid/.test(session))
     throw new Error(session);
 
-  var getOptions = {
-    follow: 10
-  };
   var tempConfig = process.cwd() + '/config-tmp.json';
   var tempZip = process.cwd() + '/fontello-tmp.zip';
   setSession(options, session);
@@ -154,7 +175,7 @@ var fetchStream = function(options, session, callback){
         .on('entry', function(entry){
           var ext = path.extname(entry.path);
           var name = path.basename(entry.path);
-          
+
           if(entry.type === 'File') {
             if(options.exclude.indexOf(name) !== -1) {
                 grunt.verbose.writeln('Ignored ', entry.path);
@@ -216,6 +237,7 @@ var fetchStream = function(options, session, callback){
 
 module.exports = {
   init    : init,
+  check   : checkSession,
   post    : createSession,
   fetch   : fetchStream
  };
