@@ -29,8 +29,9 @@ module.exports = function(grunt) {
         updateConfig   : false
       });
 
-    var recipe = [ 
+    var recipe = [
       fontello.init.bind(null, options),
+      fontello.check,
       fontello.post,
       fontello.fetch
     ];
