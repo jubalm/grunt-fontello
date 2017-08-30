@@ -80,7 +80,7 @@ var init = function(options, callback){
 * */
 var checkSession = function(options, callback){
   var expired = false;
-  var config = require(process.cwd() + '/' + options.config);
+  var config = require(path.resolve(process.cwd(), options.config));
 
   grunt.log.write('Checking session...');
   needle.get(options.host + '/' + config.name + '/get', getOptions, function(err, response, body){
