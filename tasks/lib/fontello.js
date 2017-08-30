@@ -34,7 +34,7 @@ var processPath = function(options, dir, callback){
 };
 
 var setSession = function(options, session, config){
-  var dest = process.cwd() + '/' + options.config;
+  var dest = path.resolve(process.cwd(), options.config);
 
   if (undefined == config)
     config = require(dest);
@@ -110,7 +110,7 @@ var createSession = function(options, expired, callback){
   };
 
   var session = null;
-  var config = require(process.cwd() + '/' + options.config);
+  var config = require(path.resolve(process.cwd(), options.config));
 
   if (config.name && !expired) {
     session = config.name
@@ -147,8 +147,8 @@ var fetchStream = function(options, session, callback){
   if (/Invalid/.test(session))
     throw new Error(session);
 
-  var tempConfig = process.cwd() + '/config-tmp.json';
-  var tempZip = process.cwd() + '/fontello-tmp.zip';
+  var tempConfig = path.resolve(process.cwd(), 'config-tmp.json');
+  var tempZip = path.resolve(process.cwd(), 'fontello-tmp.zip');
   setSession(options, session);
 
   grunt.log.write('Fetching archive...');
