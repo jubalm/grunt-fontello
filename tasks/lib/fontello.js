@@ -1,5 +1,6 @@
 // TODO: Clean up comments
 
+var os      = require('os');
 var fs      = require('fs');
 var path    = require('path');
 var async   = require('async');
@@ -34,7 +35,7 @@ var processPath = function(options, dir, callback){
 };
 
 var getSession = function(){
-  var src = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
+  var src = path.resolve(os.tmpdir(), 'grunt-fontello-session');
 
   // Make sure the session file exists, return `null` otherwise.
   if (!fs.existsSync(src)) {
@@ -46,14 +47,7 @@ var getSession = function(){
 }
 
 var setSession = function(session){
-  var dir = path.resolve(process.cwd(), 'node_modules/grunt-fontello');
-  var dest = path.resolve(dir, 'session');
-
-  // Make sure the grunt-fontello directory exists, otherwise
-  // just don't safe the session.
-  if (!fs.existsSync(dir)) {
-    return null;
-  }
+  var dest = path.resolve(os.tmpdir(), 'grunt-fontello-session');
 
   // Write session to the session file since the Fontello
   // api dislikes custom members.
