@@ -33,16 +33,31 @@ var processPath = function(options, dir, callback){
   });
 };
 
-var setSession = function(options, session, config){
-  var dest = path.resolve(process.cwd(), options.config);
+var getSession = function(){
+  var src = path.resolve(process.cwd(), 'node_modules/grunt-fontello/session');
 
-  if (undefined == config)
-    config = require(dest);
+  // Make sure the session file exists, return `null` otherwise.
+  if (!fs.existsSync(src)) {
+    return null;
+  }
 
-  // Write session to config file. Save session in name field since the
-  // Fontello api dislikes custom members.
-  config.name = session;
-  fs.writeFileSync(dest, JSON.stringify(config, null, '\t'));
+  // Read session from the session file.
+  return fs.readFileSync(src, { encoding: 'utf-8'});
+}
+
+var setSession = function(session){
+  var dir = path.resolve(process.cwd(), 'node_modules/grunt-fontello');
+  var dest = path.resolve(dir, 'session');
+
+  // Make sure the grunt-fontello directory exists, otherwise
+  // just don't safe the session.
+  if (!fs.existsSync(dir)) {
+    return null;
+  }
+
+  // Write session to the session file since the Fontello
+  // api dislikes custom members.
+  fs.writeFileSync(dest, session);
 }
 
 /*
@@ -80,16 +95,21 @@ var init = function(options, callback){
 * */
 var checkSession = function(options, callback){
   var expired = false;
-  var config = require(path.resolve(process.cwd(), options.config));
+  var session = getSession();
 
   grunt.log.write('Checking session...');
-  needle.get(options.host + '/' + config.name + '/get', getOptions, function(err, response, body){
-    if(response.statusCode == 500)
-      expired = true;
+  if(session !== null) {
+    needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
+      if(response.statusCode == 500)
+        expired = true;
 
-    grunt.log.ok();
-    callback(null, options, expired);
-  });
+      grunt.log.ok();
+      callback(null, options, expired);
+    });
+  }
+  else {
+    callback(null, options, true);
+  }
 };
 
 /*
@@ -100,8 +120,6 @@ var checkSession = function(options, callback){
 * */
 var createSession = function(options, expired, callback){
 
-  // TODO: save session somewhere else?
-
   var data = {
     config: {
       file: options.config,
@@ -109,11 +127,9 @@ var createSession = function(options, expired, callback){
     }
   };
 
-  var session = null;
-  var config = require(path.resolve(process.cwd(), options.config));
+  var session = getSession();
 
-  if (config.name && !expired) {
-    session = config.name
+  if (session !== null && !expired) {
     callback(null, options, session);
   }
   else {
@@ -126,6 +142,9 @@ var createSession = function(options, expired, callback){
          else {
            grunt.log.ok();
            grunt.log.debug('sid: ' + body);
+
+           // Store the new sid and continue
+           setSession(body);
            callback(null, options, body);
          }
        }
@@ -149,7 +168,6 @@ var fetchStream = function(options, session, callback){
 
   var tempConfig = path.resolve(process.cwd(), 'config-tmp.json');
   var tempZip = path.resolve(process.cwd(), 'fontello-tmp.zip');
-  setSession(options, session);
 
   grunt.log.write('Fetching archive...');
   needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
@@ -195,15 +213,6 @@ var fetchStream = function(options, session, callback){
                   path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
                   return entry.pipe(fs.createWriteStream(cssPath));
                 }
-              case '.json':
-                if (options.updateConfig) {
-                  var r = entry.pipe(fs.createWriteStream(tempConfig));
-                  r.on('finish', function() {
-                    var config = require(tempConfig);
-                    setSession(options, session, config);
-                    fs.unlinkSync(tempConfig);
-                  });
-               }
               // Drain everything else
               default:
                 grunt.verbose.writeln('Ignored ', entry.path);
