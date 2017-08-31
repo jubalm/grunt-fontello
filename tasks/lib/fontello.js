@@ -54,6 +54,37 @@ var setSession = function(session){
   fs.writeFileSync(dest, session);
 }
 
+var setFontPath = function (options, callback) {
+  var css2FontPath = path.relative(options.styles, options.fonts);
+
+  grunt.log.write('Processing font path...');
+
+  try {
+    fs.readdir(options.styles, function (err, files) {
+      for (i in files) {
+        if (!files.hasOwnProperty(i))
+          continue;
+
+        var filePath = path.join(options.styles, files[i]);
+
+        if (fs.statSync(filePath).isDirectory())
+          continue;
+
+        var content = fs.readFileSync(filePath);
+        fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath))
+      }
+    });
+
+    grunt.log.debug('Font path is ' + css2FontPath);
+    grunt.log.ok();
+    callback(null, 'extract complete');
+  } catch (err) {
+    grunt.log.error(err);
+    grunt.log.fail();
+    callback(err);
+  }
+}
+
 /*
 * Initial Checks
 * @callback: options
@@ -218,7 +249,7 @@ var fetchStream = function(options, session, callback){
         .on('close', function(){
            fs.unlinkSync(tempZip);
            grunt.log.ok();
-           callback(null, 'extract complete');
+           callback(null, options);
         });
       }
       /* Extract full archive */
@@ -242,5 +273,6 @@ module.exports = {
   init    : init,
   check   : checkSession,
   post    : createSession,
-  fetch   : fetchStream
+  fetch   : fetchStream,
+  fontPath: setFontPath
  };
