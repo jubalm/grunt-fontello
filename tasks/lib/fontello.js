@@ -1,13 +1,14 @@
 // TODO: Clean up comments
 
-var os      = require('os');
-var fs      = require('fs');
-var path    = require('path');
-var async   = require('async');
-var needle  = require('needle');
-var unzip   = require('unzip');
-var mkdirp  = require('mkdirp');
-var grunt   = require('grunt');
+var os        = require('os');
+var fs        = require('fs');
+var path      = require('path');
+var async     = require('async');
+var needle    = require('needle');
+var unzip     = require('unzip');
+var mkdirp    = require('mkdirp');
+var grunt     = require('grunt');
+var normalize = require('normalize-path');
 
 var getOptions = {
   follow: 10
@@ -55,7 +56,7 @@ var setSession = function(session){
 }
 
 var setFontPath = function (options, callback) {
-  var css2FontPath = path.relative(options.styles, options.fonts);
+  var css2FontPath = normalize(path.relative(options.styles, options.fonts));
 
   grunt.log.write('Processing font path...');
 
