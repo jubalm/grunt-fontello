@@ -8,12 +8,12 @@
 
 'use strict';
 
-module.exports = function(grunt) {
+module.exports = function(grunt){
 
   var fontello  = require('./lib/fontello'),
       async     = require('async');
 
-  grunt.registerMultiTask('fontello', 'Download font library from fontello.com', function() {
+  grunt.registerMultiTask('fontello', 'Download font library from fontello.com', function(){
 
     var
       done    = this.async(),

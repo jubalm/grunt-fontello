@@ -1,5 +1,3 @@
-// TODO: Clean up comments
-
 var os        = require('os');
 var fs        = require('fs');
 var path      = require('path');
@@ -16,74 +14,91 @@ var getOptions = {
 
 /* Verify or build paths */
 var processPath = function(options, dir, callback){
+
   fs.exists(dir, function(exists){
+
     if(!exists) {
       if(!options.force) {
         callback(dir + ' missing! use `force:true` to create');
-      } else {
+      }
+      else {
         // Force create path
         mkdirp(dir, function(err){
-          if (err) { callback(err); }
+          if (err) {
+            callback(err);
+          }
           else {
             callback(null, dir + ' created!');
           }
         });
       }
-    } else {
+    }
+    else {
       callback(null, dir + ' verified!');
     }
+
   });
+
 };
 
+/* Get session */
 var getSession = function(){
+
   var src = path.resolve(os.tmpdir(), 'grunt-fontello-session');
 
   // Make sure the session file exists, return `null` otherwise.
-  if (!fs.existsSync(src)) {
+  if(!fs.existsSync(src))
     return null;
-  }
 
   // Read session from the session file.
-  return fs.readFileSync(src, { encoding: 'utf-8'});
+  return fs.readFileSync(src, { encoding: 'utf-8' });
+
 }
 
+/* Set session */
 var setSession = function(session){
+
   var dest = path.resolve(os.tmpdir(), 'grunt-fontello-session');
 
   // Write session to the session file since the Fontello
   // api dislikes custom members.
   fs.writeFileSync(dest, session);
+
 }
 
-var setFontPath = function (options, callback) {
-  var css2FontPath = normalize(path.relative(options.styles, options.fonts));
+/* Set relative font path */
+var setFontPath = function(options, callback){
 
+  var css2FontPath = normalize(path.relative(options.styles, options.fonts));
   grunt.log.write('Processing font path...');
 
   try {
-    fs.readdir(options.styles, function (err, files) {
-      for (i in files) {
-        if (!files.hasOwnProperty(i))
+    fs.readdir(options.styles, function(err, files){
+
+      for(var i in files) {
+        if(!files.hasOwnProperty(i))
           continue;
 
         var filePath = path.join(options.styles, files[i]);
 
-        if (fs.statSync(filePath).isDirectory())
+        if(fs.statSync(filePath).isDirectory())
           continue;
 
         var content = fs.readFileSync(filePath);
-        fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath))
+        fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath));
+
       }
     });
 
     grunt.log.debug('Font path is ' + css2FontPath);
     grunt.log.ok();
     callback(null, 'extract complete');
-  } catch (err) {
+  } catch(err) {
     grunt.log.error(err);
     grunt.log.fail();
     callback(err);
   }
+
 }
 
 /*
@@ -97,7 +112,9 @@ var init = function(options, callback){
     processPath.bind(null, options, options.fonts),
     processPath.bind(null, options, options.styles)
   ];
+
   async.parallel(options.styles ? tests : [tests[0]], function(err, results){
+
     if(err) {
       grunt.log.error(err);
       callback(err);
@@ -109,6 +126,7 @@ var init = function(options, callback){
       });
       callback(null, options);
     }
+
   });
 
 };
@@ -120,22 +138,26 @@ var init = function(options, callback){
 * @callback: bool representing expiration of session
 * */
 var checkSession = function(options, callback){
+
   var expired = false;
   var session = getSession();
 
   grunt.log.write('Checking session...');
   if(session !== null) {
     needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
-      if(response.statusCode == 500)
+
+      if(response.statusCode === 500)
         expired = true;
 
       grunt.log.ok();
       callback(null, options, expired);
+
     });
   }
   else {
     callback(null, options, true);
   }
+
 };
 
 /*
@@ -160,21 +182,22 @@ var createSession = function(options, expired, callback){
   }
   else {
     grunt.log.write('Creating session...');
-    needle.post( options.host, data, { multipart: true }, function(err, res, body){
-         if (err) {
-           grunt.log.error();
-           callback(err);
-         }
-         else {
-           grunt.log.ok();
-           grunt.log.debug('sid: ' + body);
+    needle.post( options.host, data, { multipart: true }, function(err, response, body){
 
-           // Store the new sid and continue
-           setSession(body);
-           callback(null, options, body);
-         }
+       if (err) {
+         grunt.log.error();
+         callback(err);
        }
-    );
+       else {
+         grunt.log.ok();
+         grunt.log.debug('sid: ' + body);
+
+         // Store the new sid and continue
+         setSession(body);
+         callback(null, options, body);
+       }
+
+     });
   }
 
 };
@@ -189,70 +212,67 @@ var fetchStream = function(options, session, callback){
 
   // The Fontello api outputs an error message instead of a session id if the
   // config file contains unexpected data. Pass that error on.
-  if (/Invalid/.test(session))
+  if(/Invalid/.test(session))
     throw new Error(session);
 
-  var tempConfig = path.resolve(process.cwd(), 'config-tmp.json');
-  var tempZip = path.resolve(process.cwd(), 'fontello-tmp.zip');
+  var tempConfig = path.resolve(os.tmpdir(), 'config-tmp.json');
+  var tempZip = path.resolve(os.tmpdir(), 'fontello-tmp.zip');
 
   grunt.log.write('Fetching archive...');
   needle.get(options.host + '/' + session + '/get', getOptions, function(err, response, body){
 
-    if (err) {
+    if(err)
       throw err;
-    }
 
-    if(response.statusCode == 404)
-    {
+    if(response.statusCode == 404) {
       setSession(options, '');
-	  createSession(options, fetchStream);
-    }
-    else
-    {
+      createSession(options, fetchStream);
+    } else {
       fs.writeFileSync(tempZip, body);
       var readStream = fs.createReadStream(tempZip);
 
       /* Extract Files */
       if(options.fonts || options.styles) {
-      return readStream.pipe(unzip.Parse())
-        // TODO: fix inconsistent return point
-        .on('entry', function(entry){
-          var ext = path.extname(entry.path);
-          var name = path.basename(entry.path);
+        return readStream.pipe(unzip.Parse())
+          // TODO: fix inconsistent return point
+          .on('entry', function(entry){
+            var ext = path.extname(entry.path);
+            var name = path.basename(entry.path);
 
-          if(entry.type === 'File') {
-            if(options.exclude.indexOf(name) !== -1) {
-                grunt.verbose.writeln('Ignored ', entry.path);
-                entry.autodrain();
-            } else {
-              switch(ext){
-              // Extract Fonts
-              case '.woff':case '.svg': case '.ttf': case '.eot': case '.woff2':
-                var fontPath = path.join(options.fonts, path.basename(entry.path));
-                return entry.pipe(fs.createWriteStream(fontPath));
-              // Extract CSS
-              case '.css':
-                // SCSS:
-                if (options.styles) {
-                  var cssPath = (!options.scss) ?
-                  path.join(options.styles, path.basename(entry.path)) :
-                  path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
-                  return entry.pipe(fs.createWriteStream(cssPath));
+            if(entry.type === 'File') {
+              if(options.exclude.indexOf(name) !== -1) {
+                  grunt.verbose.writeln('Ignored ', entry.path);
+                  entry.autodrain();
+              } else {
+                switch(ext){
+                // Extract Fonts
+                case '.woff':case '.svg': case '.ttf': case '.eot': case '.woff2':
+                  var fontPath = path.join(options.fonts, path.basename(entry.path));
+                  return entry.pipe(fs.createWriteStream(fontPath));
+                // Extract CSS
+                case '.css':
+                  // SCSS:
+                  if (options.styles) {
+                    var cssPath = (!options.scss) ?
+                    path.join(options.styles, path.basename(entry.path)) :
+                    path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                    return entry.pipe(fs.createWriteStream(cssPath));
+                  }
+                // Drain everything else
+                default:
+                  grunt.verbose.writeln('Ignored ', entry.path);
+                  entry.autodrain();
                 }
-              // Drain everything else
-              default:
-                grunt.verbose.writeln('Ignored ', entry.path);
-                entry.autodrain();
               }
             }
-          }
-        })
-        .on('close', function(){
-           fs.unlinkSync(tempZip);
-           grunt.log.ok();
-           callback(null, options);
-        });
+          })
+          .on('close', function(){
+             fs.unlinkSync(tempZip);
+             grunt.log.ok();
+             callback(null, options);
+          });
       }
+
       /* Extract full archive */
       return readStream.pipe(unzip.Extract({ path: options.zip }))
         .on('close', function(){
@@ -261,19 +281,15 @@ var fetchStream = function(options, session, callback){
           callback(null, 'Fontello extracted to '+options.zip);
       });
     }
-    if(err){
-      grunt.log.err();
-      callback(err);
-    }
-  });
 
+  });
 
 };
 
 module.exports = {
-  init    : init,
-  check   : checkSession,
-  post    : createSession,
-  fetch   : fetchStream,
-  fontPath: setFontPath
- };
+  init     : init,
+  check    : checkSession,
+  post     : createSession,
+  fetch    : fetchStream,
+  fontPath : setFontPath
+};
