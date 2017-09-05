@@ -253,9 +253,22 @@ var fetchStream = function(options, session, callback){
                 case '.css':
                   // SCSS:
                   if (options.styles) {
-                    var cssPath = (!options.scss) ?
-                    path.join(options.styles, path.basename(entry.path)) :
-                    path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                    var cssPath;
+                    switch(options.preprocessor.toLowerCase()) {
+                      case 'none':
+                        cssPath = path.join(options.styles, path.basename(entry.path));
+                        break;
+                      case 'less':
+                        cssPath = path.join(options.styles, path.basename(entry.path).replace(ext, '.less'));
+                        break;
+                      case 'scss':
+                        cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                        break;
+                      default:
+                        grunt.fail.warn('Unknown preprocessor "' + options.output + '"');
+                        return;
+                    }
+
                     return entry.pipe(fs.createWriteStream(cssPath));
                   }
                 // Drain everything else

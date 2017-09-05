@@ -24,7 +24,7 @@ module.exports = function(grunt){
         styles         : 'css',
         exclude        : [],
         zip            : false,
-        scss           : false,
+        preprocessor   : 'none',
         force          : true
       });
 
