@@ -102,6 +102,17 @@ var setFontPath = function(options, callback){
 }
 
 /*
+* Broadcast deprecated messages.
+* @callback: options
+* */
+var deprecated = function(options, callback){
+  if(options.scss)
+    grunt.log.warn('You\'re using the deprecated option "scss", please switch to "preprocessor" as soon as possible');
+
+  callback(null, options);
+};
+
+/*
 * Initial Checks
 * @callback: options
 * */
@@ -256,7 +267,11 @@ var fetchStream = function(options, session, callback){
                     var cssPath;
                     switch(options.preprocessor.toLowerCase()) {
                       case 'none':
-                        cssPath = path.join(options.styles, path.basename(entry.path));
+                        if(options.scss === true) {
+                          cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                        } else {
+                          cssPath = path.join(options.styles, path.basename(entry.path));
+                        }
                         break;
                       case 'less':
                         cssPath = path.join(options.styles, path.basename(entry.path).replace(ext, '.less'));
@@ -300,9 +315,10 @@ var fetchStream = function(options, session, callback){
 };
 
 module.exports = {
-  init     : init,
-  check    : checkSession,
-  post     : createSession,
-  fetch    : fetchStream,
-  fontPath : setFontPath
+  deprecated : deprecated,
+  init       : init,
+  check      : checkSession,
+  post       : createSession,
+  fetch      : fetchStream,
+  fontPath   : setFontPath
 };
