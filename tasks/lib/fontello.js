@@ -253,9 +253,10 @@ var fetchStream = function(options, session, callback){
                 case '.css':
                   // SCSS:
                   if (options.styles) {
+                    var basename = path.basename(entry.path).replace('fontello', options.prefix);
                     var cssPath = (!options.scss) ?
-                    path.join(options.styles, path.basename(entry.path)) :
-                    path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                      path.join(options.styles, basename) :
+                      path.join(options.styles, '_' + basename.replace(ext, '.scss'));
                     return entry.pipe(fs.createWriteStream(cssPath));
                   }
                 // Drain everything else

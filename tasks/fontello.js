@@ -25,7 +25,8 @@ module.exports = function(grunt){
         exclude        : [],
         zip            : false,
         scss           : false,
-        force          : true
+        force          : true,
+        prefix         : 'fontello'
       });
 
     var recipe = [
