@@ -25,7 +25,8 @@ module.exports = function(grunt){
         exclude        : [],
         zip            : false,
         scss           : false,
-        force          : true
+        force          : true,
+        cssFontPath    : undefined
       });
 
     var recipe = [
