@@ -34,14 +34,10 @@ module.exports = function(grunt) {
         styles: 'test/output/styles'
       },
       css: {
-        options: {
-          scss: false
-        }
+        options: { preprocessor: 'none' }
       },
       scss: {
-        options: {
-          scss: true
-        }
+        options: { preprocessor: 'scss' }
       }
     },
 

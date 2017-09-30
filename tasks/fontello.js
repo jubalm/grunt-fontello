@@ -24,13 +24,14 @@ module.exports = function(grunt){
         styles         : 'css',
         exclude        : [],
         zip            : false,
-        scss           : false,
+        preprocessor   : 'none',
         force          : true,
         cssFontPath    : undefined
       });
 
     var recipe = [
-      fontello.init.bind(null, options),
+      fontello.deprecated.bind(null, options),
+      fontello.init,
       fontello.check,
       fontello.post,
       fontello.fetch,

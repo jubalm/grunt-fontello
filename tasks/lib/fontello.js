@@ -102,6 +102,17 @@ var setFontPath = function(options, callback){
 }
 
 /*
+* Broadcast deprecated messages.
+* @callback: options
+* */
+var deprecated = function(options, callback){
+  if(options.scss)
+    grunt.log.warn('You\'re using the deprecated option "scss", please switch to "preprocessor" as soon as possible');
+
+  callback(null, options);
+};
+
+/*
 * Initial Checks
 * @callback: options
 * */
@@ -253,9 +264,26 @@ var fetchStream = function(options, session, callback){
                 case '.css':
                   // SCSS:
                   if (options.styles) {
-                    var cssPath = (!options.scss) ?
-                      path.join(options.styles, path.basename(entry.path)) :
-                      path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                    var cssPath;
+                    switch(options.preprocessor.toLowerCase()) {
+                      case 'none':
+                        if(options.scss === true) {
+                          cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                        } else {
+                          cssPath = path.join(options.styles, path.basename(entry.path));
+                        }
+                        break;
+                      case 'less':
+                        cssPath = path.join(options.styles, path.basename(entry.path).replace(ext, '.less'));
+                        break;
+                      case 'scss':
+                        cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                        break;
+                      default:
+                        grunt.fail.warn('Unknown preprocessor "' + options.output + '"');
+                        return;
+                    }
+
                     return entry.pipe(fs.createWriteStream(cssPath));
                   }
                 // Drain everything else
@@ -287,9 +315,10 @@ var fetchStream = function(options, session, callback){
 };
 
 module.exports = {
-  init     : init,
-  check    : checkSession,
-  post     : createSession,
-  fetch    : fetchStream,
-  fontPath : setFontPath
+  deprecated : deprecated,
+  init       : init,
+  check      : checkSession,
+  post       : createSession,
+  fetch      : fetchStream,
+  fontPath   : setFontPath
 };
