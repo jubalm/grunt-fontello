@@ -36,6 +36,9 @@ module.exports = function(grunt) {
       css: {
         options: { preprocessor: 'none' }
       },
+      less: {
+        options: { preprocessor: 'less' }
+      },
       scss: {
         options: { preprocessor: 'scss' }
       }
@@ -44,6 +47,7 @@ module.exports = function(grunt) {
     // Unit tests.
     nodeunit: {
       css: ['test/css_test.js'],
+      less: ['test/less_test.js'],
       scss: ['test/scss_test.js']
     },
 
@@ -69,9 +73,10 @@ module.exports = function(grunt) {
   // this package. Always first clean the "output" dir, then run the respective
   // fontello task, then test the results
   grunt.registerTask('test:css', ['clean:tests', 'fontello:css', 'nodeunit:css']);
+  grunt.registerTask('test:less', ['clean:tests', 'fontello:less', 'nodeunit:less']);
   grunt.registerTask('test:scss', ['clean:tests', 'fontello:scss', 'nodeunit:scss']);
   // Whenever the "test" task is run all different test scenarios.
-  grunt.registerTask('test', ['test:css', 'test:scss']);
+  grunt.registerTask('test', ['test:css', 'test:less', 'test:scss']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test', 'watch']);
