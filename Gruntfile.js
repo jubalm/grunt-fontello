@@ -41,14 +41,25 @@ module.exports = function(grunt) {
       },
       scss: {
         options: { preprocessor: 'scss' }
+      },
+      exclude: {
+        options: {
+          exclude: ['fontello-ie7.css', 'fontello.ttf'],
+          fonts: 'test/output/fonts/exclude',
+          styles: 'test/output/styles/exclude'
+        }
+      },
+      cssFontPath: {
+        options: {
+          cssFontPath: 'foobar',
+          styles: 'test/output/styles/cssFontPath'
+        }
       }
     },
 
     // Unit tests.
     nodeunit: {
-      css: ['test/css_test.js'],
-      less: ['test/less_test.js'],
-      scss: ['test/scss_test.js']
+      tests: ['test/*_test.js']
     },
 
     watch: {
@@ -57,7 +68,6 @@ module.exports = function(grunt) {
         tasks: ['test']
       }
     }
-
   });
 
   // Actually load this plugin's task(s).
@@ -69,14 +79,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  // Create seperate task lists for testing the different output methods of
-  // this package. Always first clean the "output" dir, then run the respective
-  // fontello task, then test the results
-  grunt.registerTask('test:css', ['clean:tests', 'fontello:css', 'nodeunit:css']);
-  grunt.registerTask('test:less', ['clean:tests', 'fontello:less', 'nodeunit:less']);
-  grunt.registerTask('test:scss', ['clean:tests', 'fontello:scss', 'nodeunit:scss']);
-  // Whenever the "test" task is run all different test scenarios.
-  grunt.registerTask('test', ['test:css', 'test:less', 'test:scss']);
+  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
+  // plugin's task(s), then test the result.
+  grunt.registerTask('test', ['clean', 'fontello', 'nodeunit']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test', 'watch']);
