@@ -62,13 +62,14 @@ Path to extract font files (`*.eot`, `*.woff`, `*.svg`, `*.ttf`).
 Type: `String`
 Default value: `"css"`
 
-Path to extract css or scss files. See [options.scss](#options_scss).
+Path to extract the stylesheets to.
 
-#### <a id="options_scss"></a>options.scss
-Type: `Boolean`
-Default value: `false`
+#### options.preprocessor
+Type: `String`
+Default value: `none`
 
-Setting this option to `true` will extract _.scss_ files instead of plain css.
+By default the outputted stylesheet will be _.css_. Changing this to `less` or `scss` will
+change the output to _.less_ or _.scss_ respectively.
 
 #### options.force
 Type: `Boolean`
