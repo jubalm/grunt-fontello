@@ -13,39 +13,42 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
+      options: { jshintrc: '.jshintrc' },
       all: [
         'Gruntfile.js',
         'tasks/*.js',
         '<%= nodeunit.tests %>'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
+      ]
     },
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['tmp'],
-      tmp: ['session']
+      tests: ['test/output']
     },
 
     // Configuration to be run (and then tested).
     fontello: {
-      test: {
+      options: {
+        config: 'test/fontello-config.json',
+        fonts: 'test/output/fonts',
+        styles: 'test/output/styles'
+      },
+      css: {
         options: {
-          config: 'test/config.json',
-          fonts: 'test/output/fonts',
-          styles: 'test/output/css',
-          // scss: true
-          // zip: 'test/output',
-          force: true
+          scss: false
+        }
+      },
+      scss: {
+        options: {
+          scss: true
         }
       }
     },
 
     // Unit tests.
     nodeunit: {
-      tests: ['test/*_test.js']
+      css: ['test/css_test.js'],
+      scss: ['test/scss_test.js']
     },
 
     watch: {
@@ -66,11 +69,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  // Whenever the "test" task is run, first clean the "tmp" dir, then run this
-  // plugin's task(s), then test the result.
-
-  // grunt.registerTask('test', ['clean','fontello', 'nodeunit']);
-  grunt.registerTask('test', ['fontello']);
+  // Create seperate task lists for testing the different output methods of
+  // this package. Always first clean the "output" dir, then run the respective
+  // fontello task, then test the results
+  grunt.registerTask('test:css', ['clean:tests', 'fontello:css', 'nodeunit:css']);
+  grunt.registerTask('test:scss', ['clean:tests', 'fontello:scss', 'nodeunit:scss']);
+  // Whenever the "test" task is run all different test scenarios.
+  grunt.registerTask('test', ['test:css', 'test:scss']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test', 'watch']);
