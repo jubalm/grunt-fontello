@@ -1,3 +1,5 @@
+'use strict';
+
 var os        = require('os');
 var fs        = require('fs');
 var path      = require('path');
@@ -8,6 +10,7 @@ var mkdirp    = require('mkdirp');
 var grunt     = require('grunt');
 var normalize = require('normalize-path');
 
+/* Fontello API parameters */
 var getOptions = {
   follow: 10
 };
@@ -102,7 +105,7 @@ var setFontPath = function(options, callback){
 }
 
 /*
-* Broadcast deprecated messages.
+* Display Deprecated Message(s)
 * @callback: options
 * */
 var deprecated = function(options, callback){
@@ -218,7 +221,7 @@ var createSession = function(options, expired, callback){
 * URL: http://fontello.com
 * GET: http://fontello.com/SESSIONID/get
 * callback: fetch/download result
-**/
+* */
 var fetchStream = function(options, session, callback){
 
   // The Fontello api outputs an error message instead of a session id if the
