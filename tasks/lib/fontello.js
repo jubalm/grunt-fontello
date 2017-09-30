@@ -69,7 +69,7 @@ var setSession = function(session){
 /* Set relative font path */
 var setFontPath = function(options, callback){
 
-  var css2FontPath = normalize(path.relative(options.styles, options.fonts));
+  var css2FontPath = options.cssFontPath || normalize(path.relative(options.styles, options.fonts));
   grunt.log.write('Processing font path...');
 
   try {
@@ -86,8 +86,8 @@ var setFontPath = function(options, callback){
 
         var content = fs.readFileSync(filePath);
         fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath));
-
       }
+
     });
 
     grunt.log.debug('Font path is ' + css2FontPath);
