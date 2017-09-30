@@ -1,40 +1,57 @@
 'use strict';
 
+var fs    = require('fs');
 var grunt = require('grunt');
 
-/*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
-
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
-*/
-
-// TODO: build tests
 exports.fontello = {
   setUp: function(done) {
-    // setup here if necessary
+    this.fontsPath = grunt.config.get('fontello.options.fonts');
+    this.stylesPath = grunt.config.get('fontello.options.styles');
     done();
   },
-  options: function(test) {
-    // test.expect(1);
-    // test.ok(grunt.task.run('fontello'), 'task failed!');
+  fonts: function(test) {
+    test.ok(grunt.file.exists(this.fontsPath + '/fontello.eot'), '.eot font file missing');
+    test.ok(grunt.file.exists(this.fontsPath + '/fontello.svg'), '.svg font file missing');
+    test.ok(grunt.file.exists(this.fontsPath + '/fontello.ttf'), '.ttf font file missing');
+    test.ok(grunt.file.exists(this.fontsPath + '/fontello.woff'), '.woff font file missing');
+    test.ok(grunt.file.exists(this.fontsPath + '/fontello.woff2'), '.woff2 font file missing');
     test.done();
   },
-  output: function(test) {
-    test.ok(grunt.file.exists(grunt.config('fontello.test.options.config')), 'config file not found.');
+  cssStylesheets: function(test) {
+    test.ok(grunt.file.exists(this.stylesPath + '/animation.css'), 'Animations stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello.css'), 'Fontello stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-codes.css'), 'Codes stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-embedded.css'), 'Embedded stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-ie7.css'), 'IE7 stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-ie7-codes.css'), 'IE7 codes stylesheet missing');
     test.done();
   },
+  lessStylesheets: function(test) {
+    test.ok(grunt.file.exists(this.stylesPath + '/animation.less'), 'Animations stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello.less'), 'Fontello stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-codes.less'), 'Codes stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-embedded.less'), 'Embedded stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-ie7.less'), 'IE7 stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/fontello-ie7-codes.less'), 'IE7 codes stylesheet missing');
+    test.done();
+  },
+  scssStylesheets: function(test) {
+    test.ok(grunt.file.exists(this.stylesPath + '/_animation.scss'), 'Animations stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/_fontello.scss'), 'Fontello stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/_fontello-codes.scss'), 'Codes stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/_fontello-embedded.scss'), 'Embedded stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/_fontello-ie7.scss'), 'IE7 stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/_fontello-ie7-codes.scss'), 'IE7 codes stylesheet missing');
+    test.done();
+  },
+  exclude: function(test) {
+    test.ok(!grunt.file.exists(this.fonts + '/exclude/fontello.ttf'), '.ttf font file present while excluded');
+    test.ok(!grunt.file.exists(this.stylesPath + '/exclude/fontello-ie7.css'), 'IE7 stylesheet present while excluded');
+    test.done();
+  },
+  cssFontPath: function(test) {
+    var stylesheet = fs.readFileSync(this.stylesPath + '/cssFontPath/fontello.css', { encoding: 'utf-8' });
+    test.ok(/url\('foobar/.test(stylesheet), 'CSS font path not changed');
+    test.done();
+  }
 };
