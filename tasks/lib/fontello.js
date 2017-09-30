@@ -309,7 +309,7 @@ var fetchStream = function(options, session, callback){
         .on('close', function(){
           grunt.log.ok();
           fs.unlinkSync(tempZip);
-          callback(null, 'Fontello extracted to '+options.zip);
+          callback(null, options);
       });
     }
 

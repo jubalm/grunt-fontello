@@ -5,6 +5,7 @@ var grunt = require('grunt');
 
 exports.fontello = {
   setUp: function(done) {
+    this.extractPath = grunt.config.get('fontello.zip.options.zip');
     this.fontsPath = grunt.config.get('fontello.options.fonts');
     this.stylesPath = grunt.config.get('fontello.options.styles');
     done();
@@ -52,6 +53,10 @@ exports.fontello = {
   cssFontPath: function(test) {
     var stylesheet = fs.readFileSync(this.stylesPath + '/cssFontPath/fontello.css', { encoding: 'utf-8' });
     test.ok(/url\('foobar/.test(stylesheet), 'CSS font path not changed');
+    test.done();
+  },
+  zip: function(test) {
+    test.ok(grunt.file.isDir(this.extractPath), 'Unzip extract path missing');
     test.done();
   }
 };
