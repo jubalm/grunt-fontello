@@ -42,33 +42,34 @@ grunt.initConfig({
 
 #### options.config
 Type: `String`
-Default value: `config.json`
+Default value: `"config.json"`
 
-Path to your config.json file. Generate custom font icons [here](http://www.fontello.com);
+Path to your config.json file. Generate custom font icons [here](http://www.fontello.com).
 
 #### options.zip
 Type: `String`
-Default value: `.`
+Default value: `"."`
 
 Folder to extract the full archive.
 
 #### options.fonts
 Type: `String`
-Default value: `fonts`
+Default value: `"fonts"`
 
-Path to extract font files (`*.eot`, `*.woff`, `*.svg`, `*.ttf`)
+Path to extract font files (`*.eot`, `*.woff`, `*.svg`, `*.ttf`).
 
 #### options.styles
 Type: `String`
-Default value: `css`
+Default value: `"css"`
 
-Path to extract css or scss files. See [options.scss](#options_scss)
+Path to extract the stylesheets to.
 
-#### <a id="options_scss"></a>options.scss
-Type: `Boolean`
-Default value: `false`
+#### options.preprocessor
+Type: `String`
+Default value: `none`
 
-Setting this option to `true` will extract _.scss_ files instead of plain css.
+By default the outputted stylesheet will be _.css_. Changing this to `less` or `scss` will
+change the output to _.less_ or _.scss_ respectively.
 
 #### options.force
 Type: `Boolean`
@@ -80,7 +81,13 @@ By default, if the folder specified in _options.fonts_, _options.zip_ and _optio
 Type: `Array`
 Default value: `[]`
 
-An array of names of files which are excluded
+An array of names of files which are excluded.
+
+#### options.cssFontPath
+Type: `String`
+Default value: `undefined`
+
+An explicit path to where the fonts are relative to the _.css_/_.scss_ file.
 
 #### options.prefix
 Type: `String`
@@ -126,7 +133,7 @@ grunt.initConfig({
       options: {
           fonts   : 'output/fonts',
           styles  : 'output/css',
-          exclude: ['animation.css', 'fontello-ie7-codes.css', 'fontello.eot'],
+          exclude : ['animation.css', 'fontello-ie7-codes.css', 'fontello.eot'],
       }
     },
   },

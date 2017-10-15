@@ -1,3 +1,5 @@
+'use strict';
+
 var os        = require('os');
 var fs        = require('fs');
 var path      = require('path');
@@ -8,6 +10,7 @@ var mkdirp    = require('mkdirp');
 var grunt     = require('grunt');
 var normalize = require('normalize-path');
 
+/* Fontello API parameters */
 var getOptions = {
   follow: 10
 };
@@ -69,7 +72,7 @@ var setSession = function(session){
 /* Set relative font path */
 var setFontPath = function(options, callback){
 
-  var css2FontPath = normalize(path.relative(options.styles, options.fonts));
+  var css2FontPath = options.cssFontPath || normalize(path.relative(options.styles, options.fonts));
   grunt.log.write('Processing font path...');
 
   try {
@@ -86,8 +89,8 @@ var setFontPath = function(options, callback){
 
         var content = fs.readFileSync(filePath);
         fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath));
-
       }
+
     });
 
     grunt.log.debug('Font path is ' + css2FontPath);
@@ -100,6 +103,17 @@ var setFontPath = function(options, callback){
   }
 
 }
+
+/*
+* Display Deprecated Message(s)
+* @callback: options
+* */
+var deprecated = function(options, callback){
+  if(options.scss)
+    grunt.log.warn('You\'re using the deprecated option "scss", please switch to "preprocessor" as soon as possible');
+
+  callback(null, options);
+};
 
 /*
 * Initial Checks
@@ -207,7 +221,7 @@ var createSession = function(options, expired, callback){
 * URL: http://fontello.com
 * GET: http://fontello.com/SESSIONID/get
 * callback: fetch/download result
-**/
+* */
 var fetchStream = function(options, session, callback){
 
   // The Fontello api outputs an error message instead of a session id if the
@@ -251,12 +265,28 @@ var fetchStream = function(options, session, callback){
                   return entry.pipe(fs.createWriteStream(fontPath));
                 // Extract CSS
                 case '.css':
-                  // SCSS:
                   if (options.styles) {
                     var basename = path.basename(entry.path).replace('fontello', options.prefix);
-                    var cssPath = (!options.scss) ?
-                      path.join(options.styles, basename) :
-                      path.join(options.styles, '_' + basename.replace(ext, '.scss'));
+                    var cssPath;
+                    switch(options.preprocessor.toLowerCase()) {
+                      case 'none':
+                        if(options.scss === true) {
+                          cssPath = path.join(options.styles, '_' + basename.replace(ext, '.scss'));
+                        } else {
+                          cssPath = path.join(options.styles, basename);
+                        }
+                        break;
+                      case 'less':
+                        cssPath = path.join(options.styles, basename.replace(ext, '.less'));
+                        break;
+                      case 'scss':
+                        cssPath = path.join(options.styles, '_' + basename.replace(ext, '.scss'));
+                        break;
+                      default:
+                        grunt.fail.warn('Unknown preprocessor "' + options.output + '"');
+                        return;
+                    }
+
                     return entry.pipe(fs.createWriteStream(cssPath));
                   }
                 // Drain everything else
@@ -279,7 +309,7 @@ var fetchStream = function(options, session, callback){
         .on('close', function(){
           grunt.log.ok();
           fs.unlinkSync(tempZip);
-          callback(null, 'Fontello extracted to '+options.zip);
+          callback(null, options);
       });
     }
 
@@ -288,9 +318,10 @@ var fetchStream = function(options, session, callback){
 };
 
 module.exports = {
-  init     : init,
-  check    : checkSession,
-  post     : createSession,
-  fetch    : fetchStream,
-  fontPath : setFontPath
+  deprecated : deprecated,
+  init       : init,
+  check      : checkSession,
+  post       : createSession,
+  fetch      : fetchStream,
+  fontPath   : setFontPath
 };

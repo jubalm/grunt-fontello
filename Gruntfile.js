@@ -13,32 +13,53 @@ module.exports = function(grunt) {
   // Project configuration.
   grunt.initConfig({
     jshint: {
+      options: { jshintrc: '.jshintrc' },
       all: [
         'Gruntfile.js',
         'tasks/*.js',
         '<%= nodeunit.tests %>'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
+      ]
     },
 
     // Before generating any new files, remove any previously-created files.
     clean: {
-      tests: ['tmp'],
-      tmp: ['session']
+      tests: ['test/output']
     },
 
     // Configuration to be run (and then tested).
     fontello: {
-      test: {
+      options: {
+        config: 'test/fontello-config.json',
+        fonts: 'test/output/fonts',
+        styles: 'test/output/styles'
+      },
+      css: {
+        options: { preprocessor: 'none' }
+      },
+      less: {
+        options: { preprocessor: 'less' }
+      },
+      scss: {
+        options: { preprocessor: 'scss' }
+      },
+      exclude: {
         options: {
-          config: 'test/config.json',
-          fonts: 'test/output/fonts',
-          styles: 'test/output/css',
-          // scss: true
-          // zip: 'test/output',
-          force: true
+          exclude: ['fontello-ie7.css', 'fontello.ttf'],
+          fonts: 'test/output/fonts/exclude',
+          styles: 'test/output/styles/exclude'
+        }
+      },
+      cssFontPath: {
+        options: {
+          cssFontPath: 'foobar',
+          styles: 'test/output/styles/cssFontPath'
+        }
+      },
+      zip: {
+        options: {
+          fonts: '',
+          styles: '',
+          zip: './test/output/zip'
         }
       }
     },
@@ -54,7 +75,6 @@ module.exports = function(grunt) {
         tasks: ['test']
       }
     }
-
   });
 
   // Actually load this plugin's task(s).
@@ -68,9 +88,7 @@ module.exports = function(grunt) {
 
   // Whenever the "test" task is run, first clean the "tmp" dir, then run this
   // plugin's task(s), then test the result.
-
-  // grunt.registerTask('test', ['clean','fontello', 'nodeunit']);
-  grunt.registerTask('test', ['fontello']);
+  grunt.registerTask('test', ['clean', 'fontello', 'nodeunit']);
 
   // By default, lint and run all tests.
   grunt.registerTask('default', ['jshint', 'test', 'watch']);
