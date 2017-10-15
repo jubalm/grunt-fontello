@@ -55,6 +55,14 @@ exports.fontello = {
     test.ok(/url\('foobar/.test(stylesheet), 'CSS font path not changed');
     test.done();
   },
+  prefix: function(test) {
+    test.ok(grunt.file.exists(this.stylesPath + '/prefix/foobar.css'), 'foobar stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/prefix/foobar-codes.css'), 'foobar codes stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/prefix/foobar-embedded.css'), 'foobar embedded stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/prefix/foobar-ie7.css'), 'foobar IE7 stylesheet missing');
+    test.ok(grunt.file.exists(this.stylesPath + '/prefix/foobar-ie7-codes.css'), 'foobar IE7 codes stylesheet missing');
+    test.done();
+  },
   zip: function(test) {
     test.ok(grunt.file.isDir(this.extractPath), 'Unzip extract path missing');
     test.done();
