@@ -81,7 +81,7 @@ By default, if the folder specified in _options.fonts_, _options.zip_ and _optio
 Type: `Array`
 Default value: `[]`
 
-An array of names of files which are excluded.
+An array of names of files which should be excluded. Accepts strings and regular expressions.
 
 #### options.cssFontPath
 Type: `String`

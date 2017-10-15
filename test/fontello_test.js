@@ -48,6 +48,7 @@ exports.fontello = {
   exclude: function(test) {
     test.ok(!grunt.file.exists(this.fonts + '/exclude/fontello.ttf'), '.ttf font file present while excluded');
     test.ok(!grunt.file.exists(this.stylesPath + '/exclude/fontello-ie7.css'), 'IE7 stylesheet present while excluded');
+    test.ok(!grunt.file.exists(this.stylesPath + '/exclude/fontello-ie7-codes.css'), 'IE7 codes stylesheet present while excluded');
     test.done();
   },
   cssFontPath: function(test) {
