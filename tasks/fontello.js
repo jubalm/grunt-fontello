@@ -25,7 +25,8 @@ module.exports = function(grunt){
           zip          : false,
           preprocessor : 'none',
           force        : true,
-          cssFontPath  : undefined
+          cssFontPath  : undefined,
+          prefix       : 'fontello'
         });
 
     var recipe = [

@@ -265,22 +265,22 @@ var fetchStream = function(options, session, callback){
                   return entry.pipe(fs.createWriteStream(fontPath));
                 // Extract CSS
                 case '.css':
-                  // SCSS:
                   if (options.styles) {
+                    var basename = path.basename(entry.path).replace('fontello', options.prefix);
                     var cssPath;
                     switch(options.preprocessor.toLowerCase()) {
                       case 'none':
                         if(options.scss === true) {
-                          cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                          cssPath = path.join(options.styles, '_' + basename.replace(ext, '.scss'));
                         } else {
-                          cssPath = path.join(options.styles, path.basename(entry.path));
+                          cssPath = path.join(options.styles, basename);
                         }
                         break;
                       case 'less':
-                        cssPath = path.join(options.styles, path.basename(entry.path).replace(ext, '.less'));
+                        cssPath = path.join(options.styles, basename.replace(ext, '.less'));
                         break;
                       case 'scss':
-                        cssPath = path.join(options.styles, '_' + path.basename(entry.path).replace(ext, '.scss'));
+                        cssPath = path.join(options.styles, '_' + basename.replace(ext, '.scss'));
                         break;
                       default:
                         grunt.fail.warn('Unknown preprocessor "' + options.output + '"');

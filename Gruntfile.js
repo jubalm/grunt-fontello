@@ -55,6 +55,12 @@ module.exports = function(grunt) {
           styles: 'test/output/styles/cssFontPath'
         }
       },
+      prefix: {
+        options: {
+          prefix: 'foobar',
+          styles: 'test/output/styles/prefix'
+        }
+      },
       zip: {
         options: {
           fonts: '',
