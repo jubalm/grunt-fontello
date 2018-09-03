@@ -254,11 +254,15 @@ var fetchStream = function(options, session, callback){
             var name = path.basename(entry.path);
 
             if(entry.type === 'File') {
-              if(options.exclude.indexOf(name) !== -1) {
+              for(var rule of options.exclude) {
+                if(rule === name || name.match(rule)) {
                   grunt.verbose.writeln('Ignored ', entry.path);
                   entry.autodrain();
-              } else {
-                switch(ext){
+                  return;
+                }
+              }
+
+              switch(ext) {
                 // Extract Fonts
                 case '.woff':case '.svg': case '.ttf': case '.eot': case '.woff2':
                   var fontPath = path.join(options.fonts, path.basename(entry.path));
@@ -293,7 +297,6 @@ var fetchStream = function(options, session, callback){
                 default:
                   grunt.verbose.writeln('Ignored ', entry.path);
                   entry.autodrain();
-                }
               }
             }
           })

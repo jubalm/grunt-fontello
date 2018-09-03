@@ -44,7 +44,7 @@ module.exports = function(grunt) {
       },
       exclude: {
         options: {
-          exclude: ['fontello-ie7.css', 'fontello.ttf'],
+          exclude: [/fontello-ie7*/, 'fontello.ttf'],
           fonts: 'test/output/fonts/exclude',
           styles: 'test/output/styles/exclude'
         }
