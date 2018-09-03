@@ -1,7 +1,7 @@
 {
   "name": "grunt-fontello",
   "description": "Download font library from fontello.com",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "homepage": "https://github.com/jubalm/grunt-fontello",
   "author": {
     "name": "Jubal Mabaquiao",
@@ -25,7 +25,6 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "lint": "grunt jshint",
     "test": "grunt test"
   },
   "devDependencies": {
