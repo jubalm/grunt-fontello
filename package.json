@@ -47,6 +47,6 @@
     "mkdirp": "~0.3.5",
     "needle": "~0.11.0",
     "normalize-path": "^2.1.1",
-    "unzip": "~0.1.9"
+    "unzipper": "~0.10.0"
   }
 }
