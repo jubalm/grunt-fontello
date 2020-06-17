@@ -76,22 +76,19 @@ var setFontPath = function(options, callback){
   grunt.log.write('Processing font path...');
 
   try {
-    fs.readdir(options.styles, function(err, files){
+    var files = fs.readdirSync(options.styles);
+    for(var i in files) {
+      if(!files.hasOwnProperty(i))
+        continue;
 
-      for(var i in files) {
-        if(!files.hasOwnProperty(i))
-          continue;
+      var filePath = path.join(options.styles, files[i]);
 
-        var filePath = path.join(options.styles, files[i]);
+      if(fs.statSync(filePath).isDirectory())
+        continue;
 
-        if(fs.statSync(filePath).isDirectory())
-          continue;
-
-        var content = fs.readFileSync(filePath);
-        fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath));
-      }
-
-    });
+      var content = fs.readFileSync(filePath);
+      fs.writeFileSync(filePath, content.toString().replace(/\.\.\/font/g, css2FontPath));
+    }
 
     grunt.log.debug('Font path is ' + css2FontPath);
     grunt.log.ok();
