@@ -69,6 +69,16 @@ var setSession = function(session){
 
 }
 
+/* Clear session */
+var clearSession = function(){  
+  var dest = path.resolve(os.tmpdir(), 'grunt-fontello-session');
+
+  if (fs.existsSync(dest)) {
+    // Do something
+    fs.unlinkSync(dest);
+  }
+}
+
 /* Set relative font path */
 var setFontPath = function(options, callback){
 
@@ -185,7 +195,8 @@ var createSession = function(options, expired, callback){
       content_type: 'application/json'
     }
   };
-
+  
+  clearSession();
   var session = getSession();
 
   if (session !== null && !expired) {
