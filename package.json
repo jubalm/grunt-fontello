@@ -43,7 +43,7 @@
   ],
   "dependencies": {
     "async": "~0.2.9",
-    "grunt": "~1.0.1",
+    "grunt": "~1.3.0",
     "mkdirp": "~0.3.5",
     "needle": "~0.11.0",
     "normalize-path": "^2.1.1",
